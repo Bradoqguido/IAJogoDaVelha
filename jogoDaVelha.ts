@@ -1,7 +1,7 @@
 function jogoDaVelha() {
     let table = ['1','2','3',
-                '4','5','6',
-                '7','8','9']
+                 '4','5','6',
+                 '7','8','9']
     let playing = true
     let input
 
@@ -18,6 +18,20 @@ function jogoDaVelha() {
         return ''
     }
 
+    function verificaVelha() {
+        if (table[0] !== '1' && 
+            table[1] !== '2' &&
+            table[2] !== '3' && 
+            table[3] !== '4' && 
+            table[4] !== '5' && 
+            table[5] !== '6' && 
+            table[6] !== '7' && 
+            table[7] !== '8' && 
+            table[8] !== '9') return true
+
+        return false
+    }
+
     function printTabuleiro() {
         console.log(`${table[0]}|${table[1]}|${table[2]}`)
         console.log('------')
@@ -27,7 +41,7 @@ function jogoDaVelha() {
     }
 
     function verificaJogada(pJogada, pMarcador) {
-        if (pJogada === null && pJogada === undefined) return false // previne uma jogada invalida
+        if (pJogada === null || pJogada === undefined || pJogada === '' || pJogada < 0 || pJogada > 9) return false // previne uma jogada invalida
 
         const jogada = Number(pJogada)-1 // converte a jogada para número
 
@@ -38,45 +52,72 @@ function jogoDaVelha() {
         }
 
         table[jogada] = pMarcador
+        return true
     }
 
-    let marcador
-    function selecionaMarcador() {
+    function selecionarMarcador() {
         input = prompt('Você jogará com X ou com O? ')
-        marcador = input === 'X' || input === 'O' ? input : null
+        return input === 'X' || input === 'O' ? false : true
+    }
+
+    function exibirInstrucoes() {
+        console.clear()
+        printTabuleiro()
+        console.log('Para jogar digite o número no tabuleiro que representa sua jogada.');
+        console.log('O número no tabuleiro será substituido pelo seu marcador.');
     }
 
     const player = prompt('Digite seu nome: ')
-    
-    selecionaMarcador()    
+    while (selecionarMarcador()) { }
+
     const marcadorHumano = input
-    const marcadorMaquina = marcadorHumano === 'X' ? 'O' : 'X'
+    const marcadorMaquina = marcadorHumano === 'X' ? 'O' : 'X'    
 
-    while (playing) { 
-        // Limpa o console.
-        console.clear()
-
+    while (playing) {
         if (verificaVitoria() === marcadorHumano) {
+            console.clear()
             printTabuleiro()
-            console.log('Você venceu!')
+            console.log(`${player}, Você venceu!`)
             break
         }
 
         if (verificaVitoria() === marcadorMaquina) {
+            console.clear()
             printTabuleiro()
             console.log('A máquina venceu!')
             break
         }
-        console.log('Para jogar digite o número no tabuleiro que representa sua jogada.');
-        console.log('O número no tabuleiro será substituido pelo seu marcador.');
-        
-        printTabuleiro()
 
-        // Jogada da máquina. A máquina joga até a jogada ser válida.
-        verificaJogada(Math.floor(Math.random() * 10), marcadorMaquina)
+        if (verificaVelha()) {
+            console.clear()
+            printTabuleiro()
+            console.log('Empate!')
+            break
+        }
 
-        // Jogada do player. O player joga até a jogada ser válida.
-        const jogada = prompt('Digite o número da sua jogada: ')
-        verificaJogada(jogada, marcadorHumano)
+        let maquinaJogando = true
+        while (maquinaJogando) {
+            // Jogada da máquina. A máquina joga até a jogada ser válida.
+            if(verificaJogada(Math.floor(Math.random() * 10), marcadorMaquina)) {
+                maquinaJogando = false
+                break
+            }
+            maquinaJogando = true
+        }
+
+        exibirInstrucoes()
+
+        let playerJogando = true
+        while (playerJogando) {
+            // Jogada do player. O player joga até a jogada ser válida.
+            const jogada = prompt('Digite o número da sua jogada: ')
+            if(verificaJogada(jogada, marcadorHumano)) {
+                playerJogando = false
+                break
+            }
+            playerJogando = true
+        }
+
+        exibirInstrucoes()
     }
 }
