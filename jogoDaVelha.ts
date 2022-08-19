@@ -73,6 +73,15 @@ function jogoDaVelha() {
     const marcadorHumano = input
     const marcadorMaquina = marcadorHumano === 'X' ? 'O' : 'X'    
 
+    function prediction() {
+        const fatorHumano = Math.floor(Math.random() * 10) // Fator humano simulado.
+        
+        const jogadaHumana = table.find(marcadorHumano)
+        if (jogadaHumana === undefined) return fatorHumano
+        
+        return fatorHumano
+    }
+
     while (playing) {
         if (verificaVitoria() === marcadorHumano) {
             console.clear()
@@ -98,7 +107,7 @@ function jogoDaVelha() {
         let maquinaJogando = true
         while (maquinaJogando) {
             // Jogada da máquina. A máquina joga até a jogada ser válida.
-            if(verificaJogada(Math.floor(Math.random() * 10), marcadorMaquina)) {
+            if(verificaJogada(prediction(), marcadorMaquina)) {
                 maquinaJogando = false
                 break
             }
