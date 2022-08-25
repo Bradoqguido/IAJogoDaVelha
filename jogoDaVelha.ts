@@ -2,6 +2,15 @@ function jogoDaVelha() {
     let table = ['1','2','3',
                  '4','5','6',
                  '7','8','9']
+
+    let pesoJogo = [0.9,0.6,0.9,
+                    0.6,0.3,0.6,
+                    0.9,0.6,0.9]
+
+    let pesosHumano = [-0.9,-0.6,-0.9,
+                       -0.6,-0.3,-0.6,
+                       -0.9,-0.6,-0.9]
+                
     let playing = true
     let input
 
@@ -73,12 +82,54 @@ function jogoDaVelha() {
     const marcadorHumano = input
     const marcadorMaquina = marcadorHumano === 'X' ? 'O' : 'X'    
 
-    function prediction() {
-        const fatorHumano = Math.floor(Math.random() * 10) // Fator humano simulado.
+    function equacaoDePrecicao(pesoQuadrante1, pesoQuadrante2, pesoQuadrante3, pQuadranteJogada) {
+        return (((pesoQuadrante1+pesoQuadrante2+pesoQuadrante3)/3) * pQuadranteJogada)
+    }
+
+    // retorna o marcador.
+    function predicao() {
+        let jogada = -1
+        const jogadasPossiveis = [
+            [0,1,2], // linha
+            [3,4,5], // linha
+            [6,7,8], // linha
+            [0,4,8], // diagonal
+            [2,4,6], // diagonal
+            [0,3,6], // coluna
+            [1,4,7], // coluna
+            [2,5,8], // coluna
+        ]        
+
+        let jogadasPossiveisCalculadas
+        table.forEach(quadranteJogada => {
+            jogadasPossiveis.forEach(e => {
+                jogadasPossiveisCalculadas.push(
+                    {
+                        resultado: equacaoDePrecicao(pesoJogo[e[0]],pesoJogo[e[1]],pesoJogo[e[2]], quadranteJogada),
+                        jogada: quadranteJogada
+                    }
+                )
+            })
+
+            const melhorJogada = jogadasPossiveisCalculadas.map(e => { if (e.resultado <= 0) return e })
+            jogada = melhorJogada.jogada
+        })
+        
+        return jogada
+    }
+
+    function jogadaMaquina() {
+        const fatorHumano = Math.floor(Math.random() * (9 - 1) + 1) // Fator humano simulado.
+
+        const melhorJogadaPrevista = predicao()
         
         const jogadaHumana = table.find(marcadorHumano)
         if (jogadaHumana === undefined) return fatorHumano
         
+        if (Math.floor(Math.random())  < 1) {
+            return melhorJogadaPrevista
+        }
+
         return fatorHumano
     }
 
@@ -107,7 +158,7 @@ function jogoDaVelha() {
         let maquinaJogando = true
         while (maquinaJogando) {
             // Jogada da máquina. A máquina joga até a jogada ser válida.
-            if(verificaJogada(prediction(), marcadorMaquina)) {
+            if(verificaJogada(jogadaMaquina(), marcadorMaquina)) {
                 maquinaJogando = false
                 break
             }
